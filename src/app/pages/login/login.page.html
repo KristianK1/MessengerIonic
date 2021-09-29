@@ -1,0 +1,30 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>login</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-item>
+    Register
+    <ion-toggle [(ngModel)]="mode"></ion-toggle>
+    Login
+  </ion-item>
+
+  <ion-input placeholder="Enter your username" [(ngModel)]="username_login"></ion-input>
+  <ion-input placeholder="Enter your password" [(ngModel)]="password_login"></ion-input>
+  
+  <div *ngIf="mode==1">
+    <ion-button (click)="login()">
+      Login
+    </ion-button>
+  </div>
+
+  <div *ngIf="mode==0">
+    <ion-button (click)="register()">
+      Register
+    </ion-button>
+  </div>
+
+
+</ion-content>

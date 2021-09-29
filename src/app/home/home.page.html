@@ -1,0 +1,31 @@
+<ion-content>
+  <div id="people">
+    <h1 class="title">People</h1>
+    <ion-grid id="messages" size="12">
+      <ion-row sizeL="12">
+        <ion-col size="12" *ngFor="let user of otherUsers" class="message">
+          <ion-item class="messageText">
+            {{user.username}}
+          </ion-item>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+
+
+  </div>
+
+  <div id="messenger">
+    <h1 class="title">Messenger</h1>
+
+    <ion-grid id="messages" size="12">
+      <ion-row sizeL="12">
+        <ion-col size="12" *ngFor="let mess of messages" class="message">
+          <ion-item class="messageText">
+            {{mess}}
+          </ion-item> 
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </div>
+
+</ion-content>

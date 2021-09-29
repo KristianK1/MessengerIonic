@@ -1,0 +1,52 @@
+#people{
+  width: 50%;
+  height: 100%;
+  border: 1px black;
+  border-style: solid;
+  left: 0%;
+  float: left;
+}
+
+#messenger{
+  width: 50%;
+  height: 100%;
+  border: 1px black;
+  border-style: solid;
+  // align-items: center;
+  float: right;
+}
+
+.title{
+  text-align: center;
+  border-bottom: 1px black;
+  border-top: 0px;
+  border-left: 0px;
+  border-right: 0px;
+  border-style: solid;
+  height: 8%;
+  align-content: center;
+}
+
+#messages{
+  width: 50%;
+  display: flexbox;  
+  position: absolute;
+  overflow:auto;
+  height: 75%;
+
+  border-bottom: 1px black;
+  border-top: 0px;
+  border-left: 0px;
+  border-right: 0px;
+  border-style: solid;
+
+}
+.message{
+  height: fit-content;
+  width:auto;
+  align-items: flex-end;
+}
+
+.messageText{
+  text-align: right;
+}
