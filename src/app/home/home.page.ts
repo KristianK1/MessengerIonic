@@ -91,6 +91,7 @@ export class HomePage {
       if (this.currentChat.name1 === this.logedinUser.username) reciver = this.currentChat.name2;
       else reciver = this.currentChat.name1;
       this.databaseService.uploadMessage(this.logedinUser.username, reciver, this.message_text, this.currentChat.messages.length);
+      this.message_text = "";
     }
 
   }
