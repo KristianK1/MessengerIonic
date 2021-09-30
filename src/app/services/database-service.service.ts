@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 
 
-import { getDatabase, ref, set, Database, onValue } from "firebase/database";
+import { getDatabase, ref, set, Database, onValue, child, get } from "firebase/database";
 
 import { FirebaseApp } from "@angular/fire/app";
 
@@ -13,6 +13,9 @@ import { environment } from 'src/environments/environment';
 import { initializeApp } from '@firebase/app';
 import { UserData } from '../interfaces/user-data';
 import { BehaviorSubject } from 'rxjs';
+import { UserServiceService } from '../user-service.service';
+import { Chat } from '../interfaces/chat';
+import { Message } from '../interfaces/message';
 
 @Injectable({
   providedIn: 'root'
@@ -22,22 +25,33 @@ export class DatabaseServiceService {
   database: Database;
   counter: number = 0;
 
-  allUsers: Array<UserData> = new Array<UserData>();
-  allUsersSubject:  BehaviorSubject<Array<UserData>> = new BehaviorSubject<Array<UserData>>(null);
+  logedinUser: UserData;
+
+  allUsers: Array<UserData> = new Array<UserData>();  //koristi se samo kao temp varijabla
+  allUsersSubject: BehaviorSubject<Array<UserData>> = new BehaviorSubject<Array<UserData>>(null);
+
+  myChats: BehaviorSubject<Array<Chat>> = new BehaviorSubject<Array<Chat>>(null);
+
+  myChatsTemp: Array<Chat> = [];
 
   constructor() {
 
     this.app = initializeApp(environment.firebaseConfig);
     this.database = getDatabase();
-    this.createReference();
+    this.createReferencetoUsers();
   }
 
   x: number = 0;
 
+  logedinUserSet(user: UserData) {
+    this.logedinUser = user;
+    this.createReferencetoMyMessages();
+  }
+
   userExists(userData: UserData): Boolean {
-    if (this.allUsers) {
-      for (let i: number = 0; i < this.allUsers.length; i++) {
-        if (this.allUsers[i].username === userData.username && this.allUsers[i].username === userData.username) {
+    if (this.allUsersSubject.value) {
+      for (let i: number = 0; i < this.allUsersSubject.value.length; i++) {
+        if (this.allUsersSubject.value[i].username === userData.username && this.allUsersSubject.value[i].username === userData.username) {
           return true;
         }
       }
@@ -46,9 +60,9 @@ export class DatabaseServiceService {
   }
 
   similarUserExists(userData: UserData): Boolean {
-    if (this.allUsers) {
-      for (let i: number = 0; i < this.allUsers.length; i++) {
-        if (this.allUsers[i].username.toLocaleLowerCase() === userData.username.toLocaleLowerCase() && this.allUsers[i].username.toLocaleLowerCase() === userData.username.toLocaleLowerCase()) {
+    if (this.allUsersSubject.value) {
+      for (let i: number = 0; i < this.allUsersSubject.value.length; i++) {
+        if (this.allUsersSubject.value[i].username.toLocaleLowerCase() === userData.username.toLocaleLowerCase() && this.allUsersSubject.value[i].username.toLocaleLowerCase() === userData.username.toLocaleLowerCase()) {
           return true;
         }
       }
@@ -58,19 +72,20 @@ export class DatabaseServiceService {
 
   addUser(userData: UserData) {
     console.log("Korisnik dodan - Database service");
-
-    for(let i: number = 0; i< this.allUsers.length;i++){
-      set(ref(this.database, 'comms/' + userData.username+"_"+this.allUsers[i].username), {
-        Name1: userData.username,
-        Name2: this.allUsers[i].username,
-        messages:
-          [
-            {
-              name: userData.username,
-              message: "Hello. I am new on this app",
-            },
-          ]
-      });
+    if (this.allUsersSubject.value) {  //upitno
+      for (let i: number = 0; i < this.allUsersSubject.value.length; i++) {
+        set(ref(this.database, 'comms/' + userData.username + "_" + this.allUsersSubject.value[i].username), {
+          Name1: userData.username,
+          Name2: this.allUsersSubject.value[i].username,
+          messages:
+            [
+              {
+                sender: userData.username,
+                text: "Hello. I am new on this app",
+              },
+            ]
+        });
+      }
     }
 
     set(ref(this.database, 'users/' + userData.username), {
@@ -92,37 +107,6 @@ export class DatabaseServiceService {
   // }
 
 
-  createReference() {
-    onValue(ref(this.database, 'users'), (snapshot) => {
-      const DataBase_Users_data = (snapshot.val());
-    
-      if(DataBase_Users_data){
-        try{
-          let keys = Object.keys(DataBase_Users_data);
-
-          for(let i : number = 0; i<keys.length; i++){
-            //this.allUsers.push(DataBase_Users_data[keys[i]]);
-            // console.log(DataBase_Users_data[keys[i]].username);
-            // console.log(DataBase_Users_data[keys[i]].password);
-            let temp: UserData = {
-              username: DataBase_Users_data[keys[i]].username,
-              password: DataBase_Users_data[keys[i]].password
-            }
-            this.allUsers.push(temp);
-          }
-          this.allUsersSubject.next(this.allUsers);
-        }
-        catch(error){
-          console.log("GREŠKA PRI ČITANJU IZ BAZE");
-          this.allUsers = [];
-        }
-      }
-    },
-      {
-        onlyOnce: false
-      }
-    );
-  }
 
 
 
@@ -133,11 +117,9 @@ export class DatabaseServiceService {
 
 
   readData() {
-    console.log("bog mater");
 
     while (this.x < 10) {
       this.x++;
-      console.log("isus");
 
       let y = ref(this.database, 'users/');
 
@@ -148,4 +130,139 @@ export class DatabaseServiceService {
       });
     }
   }
+
+
+  createReferencetoUsers() {
+    onValue(ref(this.database, 'users'), (snapshot) => {
+      const DataBase_Users_data = (snapshot.val());
+
+      if (DataBase_Users_data) {
+        try {
+          let keys = Object.keys(DataBase_Users_data);
+
+          for (let i: number = 0; i < keys.length; i++) {
+            let temp: UserData = {
+              username: DataBase_Users_data[keys[i]].username,
+              password: DataBase_Users_data[keys[i]].password
+            }
+            this.allUsers.push(temp);
+          }
+          this.allUsersSubject.next(this.allUsers);
+          this.allUsers = []; //da se ne pojave dupli accounti kad registiram korisnika
+          this.createReferencetoMyMessages();
+        }
+        catch (error) {
+          console.log("GREŠKA PRI ČITANJU IZ BAZE");
+          this.allUsers = [];  //mozda subject nulirat?
+        }
+      }
+    },
+      {
+        onlyOnce: false
+      }
+    );
+  }
+
+  async readDataMessages(): Promise<Array<String>> {
+    let temp: Array<String> = [];
+
+    await get(child(ref(this.database), "comms")).then((snapshot) => {
+      if (snapshot.exists()) {
+        temp = Object.keys(snapshot.val());
+
+      } else {
+        console.log("No data available");
+      }
+    }).catch((error) => {
+      console.error(error);
+    });
+    return temp;
+  }
+
+
+
+
+  async createReferencetoMyMessages() {
+    let numberOfConnections = this.allUsersSubject.value.length * (this.allUsersSubject.value.length - 1) / 2;
+    let messageNames: Array<String> = [];
+    await this.readDataMessages().then(val => {
+      messageNames = val;
+    });
+    //got all messages names
+    //now i need to filter my messages
+
+
+    if (!this.logedinUser) console.log("masivna greška, korisnik je null ili undefined u database servisu");
+    else {
+      this.myChatsTemp = [];
+      for (let i: number = 0; i < messageNames.length; i++) { //prolazi svim chatovima
+        let name1: String = messageNames[i].split("_")[0];
+        let name2: String = messageNames[i].split("_")[1];
+        console.log("pretrazivanje po porukama |" + name1 + "|" + name2 + "|");
+
+        if (this.logedinUser.username === name1 || this.logedinUser.username === name2) { //ude samo ako je moj chat
+
+
+          //for (let i: number = 0; i < this.allUsersSubject.value.length; i++) {
+          let tempSingleChat: Chat = {
+            name1: name1,
+            name2: name2,
+            messages: [],
+          }
+          this.myChatsTemp.push(tempSingleChat);
+          //}
+          ////////////kreiraj referencu
+          console.log("kreiranje reference izmedu" + name1 + " i " + name2);
+
+
+
+
+          //ovaj dio moze ici i u odvojenu funkciju
+          onValue(ref(this.database, 'comms/' + messageNames[i]), (snapshot) => {
+            const commsBetweenUsers = (snapshot.val());
+
+            if (commsBetweenUsers) {
+              try {
+                console.log("dogodila se promjena u commsu izmedu 2 korisnika");
+                //console.log(snapshot.val());
+
+                //<pronalazenje tog chata u myChats>
+                for (let j: number = 0; j < this.myChatsTemp.length; j++) {
+                  if (messageNames[i] === this.myChatsTemp[j].name1 + "_" + this.myChatsTemp[j].name2) {
+                    for (let k = 0; k < snapshot.val().messages.length; k++) {
+                      let tempSingleMessage: Message = {
+                        sender: snapshot.val().messages[k].sender,
+                        text: snapshot.val().messages[k].text,
+                      }
+                      this.myChatsTemp[j].messages.push(tempSingleMessage);
+                      console.log("pushed");
+
+                    }
+                  }
+                }
+                //</pronalazenje tog chata u myChats>
+                console.log("temp mychats nakon update");
+
+                console.log(this.myChatsTemp);
+                this.myChats.next(this.myChatsTemp);
+
+              }
+              catch (error) {
+                console.log("GREŠKA PRI ČITANJU IZ BAZE");
+              }
+            }
+          },
+            {
+              onlyOnce: false
+            }
+          );
+          ///////////////
+        }
+      }
+    }
+  }
+
+
+
+
 }

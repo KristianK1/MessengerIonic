@@ -4,7 +4,7 @@
     <ion-grid id="messages" size="12">
       <ion-row sizeL="12">
         <ion-col size="12" *ngFor="let user of otherUsers" class="message">
-          <ion-item class="messageText">
+          <ion-item class="messageText" (click)="changeChat(user.username)">
             {{user.username}}
           </ion-item>
         </ion-col>
@@ -19,13 +19,17 @@
 
     <ion-grid id="messages" size="12">
       <ion-row sizeL="12">
-        <ion-col size="12" *ngFor="let mess of messages" class="message">
+        <ion-col size="12" *ngFor="let mess of currentChat.messages" class="message">
           <ion-item class="messageText">
-            {{mess}}
-          </ion-item> 
+            {{mess.text}}
+          </ion-item>
         </ion-col>
       </ion-row>
     </ion-grid>
+  </div>
+  <div>
+    <ion-input id="messageInput" placeholder="Enter your text" [(ngModel)]="message_text"></ion-input>
+    <ion-button id="sendMessage" (click)="SendMessage()" >Send</ion-button>
   </div>
 
 </ion-content>

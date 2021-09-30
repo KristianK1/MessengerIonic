@@ -48,5 +48,22 @@
 }
 
 .messageText{
-  text-align: right;
+  justify-content: right;
+  width: 100%;
+}
+
+#messageInput{
+  bottom: 0%;
+  right: 10%;
+  height: 10%;
+  width: 40%;
+  position: absolute;
+}
+
+#sendMessage{
+  bottom: 0%;
+  right: 00%;
+  height: 10%;
+  width: 10%;
+  position: absolute;
 }

@@ -21,6 +21,7 @@ export class UserServiceService {
       if (this.databaseService.userExists(data)) {
         this.userSubject.next(data);
         console.log("logiran" + data.username);
+        this.databaseService.logedinUserSet(data);
         this.router.navigate(["../home"]);
       }
       else{
