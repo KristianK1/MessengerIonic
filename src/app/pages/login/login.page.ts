@@ -9,8 +9,8 @@ import { UserData } from 'src/app/interfaces/user-data';
 })
 export class LoginPage implements OnInit {
   mode: boolean = true;
-  username_login: String = "sviki";
-  password_login: String = "svikiP";
+  username_login: String = "sviki3";
+  password_login: String = "sviki3P";
 
   constructor(private userService: UserServiceService) { }
 

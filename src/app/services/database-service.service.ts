@@ -210,6 +210,8 @@ export class DatabaseServiceService {
             messages: [],
           }
           this.myChatsTemp.push(tempSingleChat);
+          
+          this.myChats.next(this.myChatsTemp);
           //}
           ////////////kreiraj referencu
           console.log("kreiranje reference izmedu" + name1 + " i " + name2);
@@ -219,24 +221,33 @@ export class DatabaseServiceService {
 
           //ovaj dio moze ici i u odvojenu funkciju
           onValue(ref(this.database, 'comms/' + messageNames[i]), (snapshot) => {
-            const commsBetweenUsers = (snapshot.val());
+            console.log("baza se pokrenila " + messageNames[i]);
 
+            const commsBetweenUsers = (snapshot.val());
             if (commsBetweenUsers) {
               try {
                 console.log("dogodila se promjena u commsu izmedu 2 korisnika");
                 //console.log(snapshot.val());
 
                 //<pronalazenje tog chata u myChats>
-                for (let j: number = 0; j < this.myChatsTemp.length; j++) {
-                  if (messageNames[i] === this.myChatsTemp[j].name1 + "_" + this.myChatsTemp[j].name2) {
-                    for (let k = 0; k < snapshot.val().messages.length; k++) {
-                      let tempSingleMessage: Message = {
-                        sender: snapshot.val().messages[k].sender,
-                        text: snapshot.val().messages[k].text,
-                      }
-                      this.myChatsTemp[j].messages.push(tempSingleMessage);
-                      console.log("pushed");
+                if (this.myChats.value) {
+                  this.myChatsTemp = this.myChats.value;
+                  for (let j: number = 0; j < this.myChatsTemp.length; j++) {
 
+                    if (messageNames[i] === this.myChatsTemp[j].name1 + "_" + this.myChatsTemp[j].name2) {
+
+                      this.myChatsTemp[j].messages = [];
+                      for (let k = 0; k < snapshot.val().messages.length; k++) {
+                        let tempSingleMessage: Message = {
+                          sender: snapshot.val().messages[k].sender,
+                          text: snapshot.val().messages[k].text,
+                        }
+                        this.myChatsTemp[j].messages.push(tempSingleMessage);
+                        console.log("pushed");
+                        console.log(tempSingleMessage);
+
+
+                      }
                     }
                   }
                 }
@@ -244,6 +255,8 @@ export class DatabaseServiceService {
                 console.log("temp mychats nakon update");
 
                 console.log(this.myChatsTemp);
+                
+                console.log("NEXTAN MyChats u bazi");
                 this.myChats.next(this.myChatsTemp);
 
               }
@@ -262,6 +275,48 @@ export class DatabaseServiceService {
     }
   }
 
+
+  uploadMessage(sender: String, reciver: String, message_text: String, message_number: number) {
+    let wantedChat: String = "";
+    let allChats = this.readDataMessages().then(val => {
+      if (val)
+        console.log(val);
+
+      for (let i = 0; i < val.length; i++) {
+        if ((val[i] === sender + "_" + reciver) || (val[i] === reciver + "_" + sender)) {
+          wantedChat = val[i];
+
+          /*let temp: Array<Chat> = this.myChats.value;
+          temp[i].messages.push({
+            sender: this.logedinUser.username,
+            text: message_text,
+          });
+
+          this.myChats.next(temp);*/
+
+
+          console.log("wanted convo");
+          console.log(wantedChat);
+
+
+        }
+      }
+      
+
+
+
+      set(ref(this.database, 'comms/' + wantedChat + "/messages/" + message_number), {
+
+        sender: this.logedinUser.username,
+        text: message_text,
+
+      });
+    });
+
+
+    //this.createReferencetoMyMessages();
+
+  }
 
 
 

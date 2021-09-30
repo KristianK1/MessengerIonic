@@ -19,9 +19,9 @@
 
     <ion-grid id="messages" size="12">
       <ion-row sizeL="12">
-        <ion-col size="12" *ngFor="let mess of currentChat.messages" class="message">
+        <ion-col size="12" *ngFor="let mess of messagesForDisplay" class="message">
           <ion-item class="messageText">
-            {{mess.text}}
+            {{mess}}
           </ion-item>
         </ion-col>
       </ion-row>
