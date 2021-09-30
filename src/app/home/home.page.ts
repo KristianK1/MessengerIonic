@@ -102,11 +102,11 @@ export class HomePage {
         if (this.myChats[i].name1 == this.currentChat.name1 && this.myChats[i].name2 == this.currentChat.name2) {
           for (let j = 0; j < this.currentChat.messages.length; j++) {
             let temp: String;
-            if (this.myChats[i].messages[j].sender == this.logedinUser.username) {
+            if (this.myChats[i].messages[j].sender === this.logedinUser.username) {
               temp = "Me: " + this.myChats[i].messages[j].text;
             }
             else {
-              temp = this.myChats[i].messages[i].sender + ": " + this.myChats[i].messages[i].text;
+              temp = this.myChats[i].messages[j].sender + ": " + this.myChats[i].messages[j].text;
             }
             this.messagesForDisplay.push(temp);
           }

@@ -18,7 +18,7 @@ export class UserServiceService {
 
   loginUser(data: UserData) {
     if (data) {
-      if (this.databaseService.userExists(data)) {
+      if (this.databaseService.userExists(data)===true) {
         this.userSubject.next(data);
         console.log("logiran" + data.username);
         this.databaseService.logedinUserSet(data);

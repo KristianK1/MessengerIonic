@@ -51,7 +51,7 @@ export class DatabaseServiceService {
   userExists(userData: UserData): Boolean {
     if (this.allUsersSubject.value) {
       for (let i: number = 0; i < this.allUsersSubject.value.length; i++) {
-        if (this.allUsersSubject.value[i].username === userData.username && this.allUsersSubject.value[i].username === userData.username) {
+        if (this.allUsersSubject.value[i].username === userData.username && this.allUsersSubject.value[i].password === userData.password) {
           return true;
         }
       }
@@ -227,14 +227,14 @@ export class DatabaseServiceService {
             if (commsBetweenUsers) {
               try {
                 console.log("dogodila se promjena u commsu izmedu 2 korisnika");
-                //console.log(snapshot.val());
+                console.log(snapshot.val());
 
                 //<pronalazenje tog chata u myChats>
                 if (this.myChats.value) {
                   this.myChatsTemp = this.myChats.value;
                   for (let j: number = 0; j < this.myChatsTemp.length; j++) {
 
-                    if (messageNames[i] === this.myChatsTemp[j].name1 + "_" + this.myChatsTemp[j].name2) {
+                    if (messageNames[i] === (this.myChatsTemp[j].name1 + "_" + this.myChatsTemp[j].name2)) {
 
                       this.myChatsTemp[j].messages = [];
                       for (let k = 0; k < snapshot.val().messages.length; k++) {
