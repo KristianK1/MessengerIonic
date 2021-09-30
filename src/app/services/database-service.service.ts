@@ -54,8 +54,13 @@ export class DatabaseServiceService {
         if (this.allUsersSubject.value[i].username === userData.username && this.allUsersSubject.value[i].password === userData.password) {
           return true;
         }
+        if(this.allUsersSubject.value[i].username === userData.username ){
+          alert("Korisničko ime je ispravno, lozinka nije. Hint: Lozinka počinje na '" + this.allUsersSubject.value[i].password[0] + "', a završava na '" + this.allUsersSubject.value[i].password.substring(1) + "'");
+          return false;
+        }
       }
     }
+    alert("Neispravni podaci");
     return false;
   }
 

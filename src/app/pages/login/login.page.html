@@ -12,7 +12,7 @@
   </ion-item>
 
   <ion-input placeholder="Enter your username" [(ngModel)]="username_login"></ion-input>
-  <ion-input placeholder="Enter your password" [(ngModel)]="password_login"></ion-input>
+  <ion-input placeholder="Enter your password" type="password" [(ngModel)]="password_login"></ion-input>
   
   <div *ngIf="mode==true">
     <ion-button (click)="login()">

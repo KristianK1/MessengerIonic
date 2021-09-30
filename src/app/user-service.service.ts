@@ -25,7 +25,6 @@ export class UserServiceService {
       }
       else{
         console.log("Nema korisnika u bazi");
-        
       }
     }
   }
@@ -33,9 +32,12 @@ export class UserServiceService {
   RegisterUser(data: UserData) {
     if (this.databaseService.similarUserExists(data)==false) {
       this.databaseService.addUser(data);
+      alert("Uspješno ste se registriali sa korisničkim imenom '" + data.username + "'");
     }
-    else console.log("Slican korisnik postoji");
-    
+    else {
+      console.log("Slican korisnik postoji");
+      alert("Postoji korisnik sa sličnim imenom");
+    }
 
   }
 
