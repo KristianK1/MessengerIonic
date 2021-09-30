@@ -71,7 +71,6 @@ export class DatabaseServiceService {
   }
 
   addUser(userData: UserData) {
-    console.log("Korisnik dodan - Database service");
     if (this.allUsersSubject.value) {  //upitno
       for (let i: number = 0; i < this.allUsersSubject.value.length; i++) {
         set(ref(this.database, 'comms/' + userData.username + "_" + this.allUsersSubject.value[i].username), {
@@ -125,7 +124,6 @@ export class DatabaseServiceService {
 
       onValue(y, (snapshot) => {
         const data = snapshot.val();
-        console.log(data);
 
       });
     }
@@ -171,7 +169,6 @@ export class DatabaseServiceService {
         temp = Object.keys(snapshot.val());
 
       } else {
-        console.log("No data available");
       }
     }).catch((error) => {
       console.error(error);
@@ -190,15 +187,12 @@ export class DatabaseServiceService {
     });
     //got all messages names
     //now i need to filter my messages
-
-
-    if (!this.logedinUser) console.log("masivna greška, korisnik je null ili undefined u database servisu");
+    if (!this.logedinUser) {}
     else {
       this.myChatsTemp = [];
       for (let i: number = 0; i < messageNames.length; i++) { //prolazi svim chatovima
         let name1: String = messageNames[i].split("_")[0];
         let name2: String = messageNames[i].split("_")[1];
-        console.log("pretrazivanje po porukama |" + name1 + "|" + name2 + "|");
 
         if (this.logedinUser.username === name1 || this.logedinUser.username === name2) { //ude samo ako je moj chat
 
@@ -214,21 +208,17 @@ export class DatabaseServiceService {
           this.myChats.next(this.myChatsTemp);
           //}
           ////////////kreiraj referencu
-          console.log("kreiranje reference izmedu" + name1 + " i " + name2);
 
 
 
 
           //ovaj dio moze ici i u odvojenu funkciju
           onValue(ref(this.database, 'comms/' + messageNames[i]), (snapshot) => {
-            console.log("baza se pokrenila " + messageNames[i]);
+          
 
             const commsBetweenUsers = (snapshot.val());
             if (commsBetweenUsers) {
               try {
-                console.log("dogodila se promjena u commsu izmedu 2 korisnika");
-                console.log(snapshot.val());
-
                 //<pronalazenje tog chata u myChats>
                 if (this.myChats.value) {
                   this.myChatsTemp = this.myChats.value;
@@ -243,8 +233,7 @@ export class DatabaseServiceService {
                           text: snapshot.val().messages[k].text,
                         }
                         this.myChatsTemp[j].messages.push(tempSingleMessage);
-                        console.log("pushed");
-                        console.log(tempSingleMessage);
+                        
 
 
                       }
@@ -252,11 +241,6 @@ export class DatabaseServiceService {
                   }
                 }
                 //</pronalazenje tog chata u myChats>
-                console.log("temp mychats nakon update");
-
-                console.log(this.myChatsTemp);
-                
-                console.log("NEXTAN MyChats u bazi");
                 this.myChats.next(this.myChatsTemp);
 
               }
@@ -279,8 +263,7 @@ export class DatabaseServiceService {
   uploadMessage(sender: String, reciver: String, message_text: String, message_number: number) {
     let wantedChat: String = "";
     let allChats = this.readDataMessages().then(val => {
-      if (val)
-        console.log(val);
+      
 
       for (let i = 0; i < val.length; i++) {
         if ((val[i] === sender + "_" + reciver) || (val[i] === reciver + "_" + sender)) {
@@ -295,8 +278,6 @@ export class DatabaseServiceService {
           this.myChats.next(temp);*/
 
 
-          console.log("wanted convo");
-          console.log(wantedChat);
 
 
         }

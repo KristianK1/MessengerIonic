@@ -14,13 +14,13 @@
   <ion-input placeholder="Enter your username" [(ngModel)]="username_login"></ion-input>
   <ion-input placeholder="Enter your password" [(ngModel)]="password_login"></ion-input>
   
-  <div *ngIf="mode==1">
+  <div *ngIf="mode==true">
     <ion-button (click)="login()">
       Login
     </ion-button>
   </div>
 
-  <div *ngIf="mode==0">
+  <div *ngIf="mode==false">
     <ion-button (click)="register()">
       Register
     </ion-button>

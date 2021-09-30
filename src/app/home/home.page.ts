@@ -29,18 +29,17 @@ export class HomePage {
     });
     databaseService.myChats.subscribe(val => {
       if (val) {
-        console.log("updatean myChats u home page-u");
         
 
         this.myChats = val;
-        console.log(this.myChats);
-        
         //kad kliknes change chat refresha se, a automatski nece pa cu ga ja ovdje changat "manualno"
         if (this.currentChat) {
           if (this.currentChat.name1 === this.logedinUser.username) this.changeChat(this.currentChat.name2);
           else this.changeChat(this.currentChat.name1);
         }
         this.displayMessages();
+        console.log(this.messagesForDisplay);
+        
       }
     });
 
@@ -54,14 +53,12 @@ export class HomePage {
   }
 
   changeChat(nameOfFriend: String) {
-    console.log(nameOfFriend);
     for (let i = 0; i < this.otherUsers.length; i++) {
       if (nameOfFriend === this.otherUsers[i].username) {
         for (let j = 0; j < this.myChats.length; j++) {
           if ((this.myChats[j].name1 === this.logedinUser.username && this.myChats[j].name2 === nameOfFriend) || (this.myChats[j].name2 === this.logedinUser.username && this.myChats[j].name1 === nameOfFriend)) {
             this.currentChat = JSON.parse(JSON.stringify(this.myChats[j]));
-            console.log("pronasao korisnika");
-            console.log(this.currentChat);
+            
 
 
           }
@@ -85,13 +82,11 @@ export class HomePage {
   message_text: String;
   SendMessage() {
     if (this.currentChat.name1.length > 0) {
-      console.log(this.message_text);
       let reciver: String;
       if (this.currentChat.name1 === this.logedinUser.username) reciver = this.currentChat.name2;
       else reciver = this.currentChat.name1;
       this.databaseService.uploadMessage(this.logedinUser.username, reciver, this.message_text, this.currentChat.messages.length);
     }
-    else console.log("nije odabran chat");
 
   }
 

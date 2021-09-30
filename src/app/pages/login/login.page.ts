@@ -9,8 +9,8 @@ import { UserData } from 'src/app/interfaces/user-data';
 })
 export class LoginPage implements OnInit {
   mode: boolean = true;
-  username_login: String = "sviki3";
-  password_login: String = "sviki3P";
+  username_login: String = "";
+  password_login: String = "";
 
   constructor(private userService: UserServiceService) { }
 
@@ -19,9 +19,7 @@ export class LoginPage implements OnInit {
 
   login() {
     if (this.username_login != "" && this.password_login != "") {
-      console.log(this.username_login);
-      console.log(this.password_login);
-      console.log("login");
+     
       let data: UserData = {
         username: this.username_login,
         password: this.password_login
@@ -32,9 +30,7 @@ export class LoginPage implements OnInit {
 
   register() {
     if (this.username_login.length >= 5 && this.password_login.length >= 5) {
-      console.log(this.username_login);
-      console.log(this.password_login);
-      console.log("register");
+     
       let data: UserData = {
         username: this.username_login,
         password: this.password_login

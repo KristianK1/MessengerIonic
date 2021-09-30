@@ -20,7 +20,6 @@ export class UserServiceService {
     if (data) {
       if (this.databaseService.userExists(data)===true) {
         this.userSubject.next(data);
-        console.log("logiran" + data.username);
         this.databaseService.logedinUserSet(data);
         this.router.navigate(["../home"]);
       }
@@ -33,7 +32,6 @@ export class UserServiceService {
 
   RegisterUser(data: UserData) {
     if (this.databaseService.similarUserExists(data)==false) {
-      console.log("Korisnik dodan - userService");
       this.databaseService.addUser(data);
     }
     else console.log("Slican korisnik postoji");
