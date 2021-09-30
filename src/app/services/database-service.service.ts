@@ -7,7 +7,7 @@ import { FirebaseApp } from "@angular/fire/app";
 
 import { AngularFireModule } from "@angular/fire/compat";
 
-import { AngularFireDatabase, AngularFireDatabaseModule } from '@angular/fire/compat/database';
+import { AngularFireDatabase, AngularFireDatabaseModule, DatabaseSnapshot } from '@angular/fire/compat/database';
 
 import { environment } from 'src/environments/environment';
 import { initializeApp } from '@firebase/app';
@@ -43,9 +43,9 @@ export class DatabaseServiceService {
 
   x: number = 0;
 
-  logedinUserSet(user: UserData) {
+  async logedinUserSet(user: UserData) {
     this.logedinUser = user;
-    this.createReferencetoMyMessages();
+    await this.createReferencetoMyMessages();
   }
 
   userExists(userData: UserData): Boolean {
@@ -85,6 +85,7 @@ export class DatabaseServiceService {
             ]
         });
       }
+      this.createReferencetoMyMessages();
     }
 
     set(ref(this.database, 'users/' + userData.username), {
@@ -130,8 +131,8 @@ export class DatabaseServiceService {
   }
 
 
-  createReferencetoUsers() {
-    onValue(ref(this.database, 'users'), (snapshot) => {
+  async createReferencetoUsers() {
+    await onValue(ref(this.database, 'users'), (snapshot) => {
       const DataBase_Users_data = (snapshot.val());
 
       if (DataBase_Users_data) {
@@ -146,6 +147,8 @@ export class DatabaseServiceService {
             this.allUsers.push(temp);
           }
           this.allUsersSubject.next(this.allUsers);
+          console.log("novi korisnik");
+          
           this.allUsers = []; //da se ne pojave dupli accounti kad registiram korisnika
           this.createReferencetoMyMessages();
         }
@@ -210,7 +213,52 @@ export class DatabaseServiceService {
           ////////////kreiraj referencu
 
 
+          //force read
+          await get(child(ref(this.database), 'comms/' + messageNames[i])).then((snapshot: any) => {
+          
 
+            const commsBetweenUsers = (snapshot.val());
+            //console.log(snapshot.val());
+            
+            if (commsBetweenUsers) {
+              try {
+                //<pronalazenje tog chata u myChats>
+                if (this.myChats.value) {
+                  this.myChatsTemp = this.myChats.value;
+                  for (let j: number = 0; j < this.myChatsTemp.length; j++) {
+
+                    if (messageNames[i] === (this.myChatsTemp[j].name1 + "_" + this.myChatsTemp[j].name2)) {
+
+                      this.myChatsTemp[j].messages = [];
+                      for (let k = 0; k < snapshot.val().messages.length; k++) {
+                        let tempSingleMessage: Message = {
+                          sender: snapshot.val().messages[k].sender,
+                          text: snapshot.val().messages[k].text,
+                        }
+                        this.myChatsTemp[j].messages.push(tempSingleMessage);
+                        
+
+
+                      }
+                    }
+                  }
+                }
+                //</pronalazenje tog chata u myChats>
+                console.log("myChatsTemp update");
+                
+                console.log(this.myChatsTemp);
+                
+                this.myChats.next(this.myChatsTemp);
+
+              }
+              catch (error) {
+                console.log("GREŠKA PRI ČITANJU IZ BAZE");
+              }
+            }
+          }
+          );
+
+          // /force read
 
           //ovaj dio moze ici i u odvojenu funkciju
           onValue(ref(this.database, 'comms/' + messageNames[i]), (snapshot) => {

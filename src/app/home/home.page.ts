@@ -1,5 +1,5 @@
 
-import { Component } from '@angular/core';
+import { Component, ChangeDetectorRef } from '@angular/core';
 import { Chat } from '../interfaces/chat';
 import { UserData } from '../interfaces/user-data';
 import { DatabaseServiceService } from '../services/database-service.service';
@@ -17,9 +17,11 @@ export class HomePage {
   messagesForDisplay: Array<String> = new Array<String>();
   currentChat: Chat;
 
-  constructor(private databaseService: DatabaseServiceService, private userService: UserServiceService) {
+  constructor(private databaseService: DatabaseServiceService, private userService: UserServiceService, private changeDetection: ChangeDetectorRef) {
     databaseService.allUsersSubject.subscribe(val => {
       if (val) {
+        console.log("novi korisnik");
+        
         this.otherUsers = val?.filter(a => a.username !== userService.userSubject.value?.username);
       }
     });
@@ -30,7 +32,7 @@ export class HomePage {
     databaseService.myChats.subscribe(val => {
       if (val) {
         
-
+        this.myChats = null;
         this.myChats = val;
         //kad kliknes change chat refresha se, a automatski nece pa cu ga ja ovdje changat "manualno"
         if (this.currentChat) {
@@ -38,7 +40,8 @@ export class HomePage {
           else this.changeChat(this.currentChat.name1);
         }
         this.displayMessages();
-        console.log(this.messagesForDisplay);
+        //this.changeDetection.detectChanges();
+        //console.log(this.messagesForDisplay);
         
       }
     });
@@ -53,6 +56,8 @@ export class HomePage {
   }
 
   changeChat(nameOfFriend: String) {
+    console.log("change chat pressed" + nameOfFriend);
+    
     for (let i = 0; i < this.otherUsers.length; i++) {
       if (nameOfFriend === this.otherUsers[i].username) {
         for (let j = 0; j < this.myChats.length; j++) {
@@ -108,5 +113,6 @@ export class HomePage {
         }
       }
     }
+    this.changeDetection.detectChanges();
   }
 }
